@@ -11,7 +11,7 @@ Keep this concise and specific to your implementation.
 
 - Which operations appear frequent?
 
-  The frequent operations are FindOutgoingConnections FindLocationByID in WorldQueries.cs. They get run once for every connection and location in the world respectively, searching through the whole array.
+  The frequent operations are FindOutgoingConnections and FindLocationByID in WorldQueries.cs. They get run once for every connection and location in the world respectively, searching through the whole array.
 
 
 - Which operation(s) do you predict may scale poorly?
@@ -21,12 +21,14 @@ Keep this concise and specific to your implementation.
 
 - What will you investigate first?
 
-  I Plan to replace the linear scan in FindOutgoingConnections with an adjacency list. This will group the connections by their source location, built once when the world is prepared. I expect this to have the largest impact as it currently scans all connections to find at most four. While the initial build costs a little extra memory, every search will be much cheaper. I will most likely implement something similar in FindLocationByID as well.
+  I plan to replace the linear scan in FindOutgoingConnections with an adjacency list. This will group the connections by their source location, built once when the world is prepared. I expect this to have the largest impact as it currently scans all connections to find at most four. While the initial build costs a little extra memory, every search will be much cheaper. I will most likely implement something similar in FindLocationByID as well.
 
 
 ## 2. Data representation
 
-Describe important changes/retained choices, operations affected, and time/memory trade-offs.
+I have kept WorldData as it is, and instead added two lookup structures to WorldQueries. They are built once in the constructor, before any queries are made.
+
+FindLocationById now uses a dictionary (hash table) with the location ID as the key. Instead of searching through every location, it looks the ID up directly. This makes it O(1) on average instead of the linear search's O(V). FindOutgoingConnections now uses an adjacency list. The connections are grouped into buckets by their FromLocationId, so each location has its own list of outgoing connections. Instead of scanning all connections, it only looks up the right bucket. This makes it O(1 + d) instead of O(E), where d is the number of outgoing connections. The trade-off is that building the structures costs O(V + E) time once, and uses about O(V + E) extra memory. The dictionaries only store references to the existing Location and Connection objects, not copies. Since the queries are repeated many times, this one-time cost is much cheaper than scanning the arrays on every call.
 
 ## 3. Algorithms and adaptation
 

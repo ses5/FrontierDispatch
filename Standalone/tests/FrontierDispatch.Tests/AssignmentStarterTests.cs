@@ -16,7 +16,7 @@ namespace FrontierDispatch.Tests
         // These tests document later assignment contracts without making the
         // untouched baseline red. Remove Ignore when you reach the named phase.
 
-        [Test, Ignore("Phase 3: enable when implementing the binary min-heap priority queue.")]
+        [Test]
         public void PriorityQueue_EnqueueAndDequeue_ReturnsLowestPriorityFirst()
         {
             var queue = new MinPriorityQueue<string>();
@@ -24,6 +24,26 @@ namespace FrontierDispatch.Tests
             queue.Enqueue("cheap", 2);
             queue.Enqueue("medium", 5);
             Assert.That(queue.Dequeue(), Is.EqualTo("cheap"));
+        }
+
+        [Test]
+        public void PriorityQueue_DequeueAll_ReturnsItemsInAscendingPriorityOrder()
+        {
+            var queue = new MinPriorityQueue<int>();
+            int[] priorities = { 7, 3, 9, 1, 5, 3, 8, 2, 6, 4, 0, 7 };
+
+            foreach (int priority in priorities)
+            {
+                queue.Enqueue(priority, priority);
+            }
+
+            var result = new int[priorities.Length];
+            for (int i = 0; i < result.Length; i++) 
+                result[i] = queue.Dequeue();
+            
+            int[] expected = { 0, 1, 2, 3, 3, 4, 5, 6, 7, 7, 8, 9 };
+            Assert.That(result, Is.EqualTo(expected));
+            Assert.That(queue.Count, Is.EqualTo(0));
         }
 
         [Test, Ignore("Phase 4: enable when implementing Dijkstra route finding.")]
