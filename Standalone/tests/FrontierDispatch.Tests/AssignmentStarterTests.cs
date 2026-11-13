@@ -46,7 +46,7 @@ namespace FrontierDispatch.Tests
             Assert.That(queue.Count, Is.EqualTo(0));
         }
 
-        [Test, Ignore("Phase 4: enable when implementing Dijkstra route finding.")]
+        [Test]
         public void Dijkstra_StartEqualsGoal_ReturnsZeroCostRoute()
         {
             var finder = new DijkstraRouteFinder(WorldDatasetFactory.CreateSmall());
@@ -54,6 +54,31 @@ namespace FrontierDispatch.Tests
             Assert.That(result.Found, Is.True);
             Assert.That(result.TotalCost, Is.EqualTo(0));
             Assert.That(result.LocationIds, Is.EqualTo(new[] { 0 }));
+        }
+
+        [Test]
+        public void Dijkstra_PrefersCheaperRouteWithMoreSteps()
+        {
+            // 0 -> 2 directly costs 10, but 0 -> 1 -> 2 costs 2 + 3 = 5.
+            var locations = new[]
+            {
+                new Location(0, "A", new WorldPosition(0, 0), "Town"),
+                new Location(1, "B", new WorldPosition(1, 0), "Town"),
+                new Location(2, "C", new WorldPosition(2, 0), "Town"),
+            };
+            var connections = new[]
+            {
+                new Connection(0, 2, 10),
+                new Connection(0, 1, 2),
+                new Connection(1, 2, 3),
+            };
+            var finder = new DijkstraRouteFinder(new WorldData(locations, connections));
+
+            RouteResult result = finder.FindRoute(0, 2);
+
+            Assert.That(result.Found, Is.True);
+            Assert.That(result.TotalCost, Is.EqualTo(5));
+            Assert.That(result.LocationIds, Is.EqualTo(new[] { 0, 1, 2 }));
         }
 
         [Test, Ignore("Phase 5: enable when implementing bounded reachability.")]

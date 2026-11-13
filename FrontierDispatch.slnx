@@ -1,0 +1,5 @@
+﻿<Solution>
+  <Project Path="FrontierDispatch.Core.csproj" />
+  <Project Path="FrontierDispatch.Unity.csproj" />
+  <Project Path="FrontierDispatch.Editor.csproj" />
+</Solution>
