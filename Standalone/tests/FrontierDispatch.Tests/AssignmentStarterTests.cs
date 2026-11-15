@@ -81,7 +81,7 @@ namespace FrontierDispatch.Tests
             Assert.That(result.LocationIds, Is.EqualTo(new[] { 0, 1, 2 }));
         }
 
-        [Test, Ignore("Phase 5: enable when implementing bounded reachability.")]
+        [Test]
         public void Reachability_ZeroBudget_IncludesStartAtZeroCost()
         {
             var query = new ReachabilityQuery(WorldDatasetFactory.CreateSmall());

@@ -39,7 +39,8 @@ namespace FrontierDispatch.Core
         public IReadOnlyDictionary<int, int> FindReachable(int startLocationId, int maxTravelCost)
         {
             // TODO: adapt shortest-path reasoning to the travel-cost budget.
-            throw new NotImplementedException();
+            
+            
         }
     }
 }
