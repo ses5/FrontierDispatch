@@ -20,6 +20,7 @@ namespace FrontierDispatch.Core
     public sealed class ReachabilityQuery
     {
         private readonly WorldData _world;
+        private readonly WorldQueries _worldQueries;
 
         /// <summary>
         /// Creates a reachability query operating on the supplied world.
@@ -27,6 +28,7 @@ namespace FrontierDispatch.Core
         public ReachabilityQuery(WorldData world)
         {
             _world = world ?? throw new ArgumentNullException(nameof(world));
+            _worldQueries = new WorldQueries(world);
         }
 
         /// <summary>
@@ -40,7 +42,39 @@ namespace FrontierDispatch.Core
         {
             // TODO: adapt shortest-path reasoning to the travel-cost budget.
             
-            
+            var bestCost = new Dictionary<int, int>();
+            var frontier = new MinPriorityQueue<(int Id, int Cost)>();
+
+            bestCost[startLocationId] = 0;
+            frontier.Enqueue((startLocationId, 0), 0);
+
+            while (frontier.Count > 0)
+            {
+                var node = frontier.Dequeue();
+                
+                var current = node.Id;
+                var priority = node.Cost;
+
+                if (priority > bestCost[current])
+                    continue;
+                
+                foreach (Connection connection in _worldQueries.FindOutgoingConnections(current))
+                {
+                    var candidate = bestCost[current] + connection.TravelCost;
+
+                    if (!bestCost.ContainsKey(connection.ToLocationId) || candidate < bestCost[connection.ToLocationId])
+                    {
+                        if (candidate <= maxTravelCost)
+                        {
+                            bestCost[connection.ToLocationId] = candidate;
+                            frontier.Enqueue((connection.ToLocationId, candidate), candidate);
+                        }
+                    }
+                }
+
+            }
+
+            return bestCost;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using FrontierDispatch.Core;
 
@@ -88,6 +89,87 @@ namespace FrontierDispatch.Tests
             var result = query.FindReachable(0, 0);
             Assert.That(result.ContainsKey(0), Is.True);
             Assert.That(result[0], Is.EqualTo(0));
+        }
+
+        // Shared world for the reachability tests below.
+        //
+        //   0 --2--> 1 --2--> 2        Cheapest costs from 0:
+        //   0 --------10----> 2          0: 0
+        //            1 --3--> 3          1: 2
+        //   4 --1--> 0                   2: 4 (via 1, not the direct 10 edge)
+        //                                3: 5
+        //                                4: unreachable (only has an edge *out*)
+        private static ReachabilityQuery CreateReachabilityWorld()
+        {
+            var locations = new[]
+            {
+                new Location(0, "A", new WorldPosition(0, 0), "Town"),
+                new Location(1, "B", new WorldPosition(1, 0), "Town"),
+                new Location(2, "C", new WorldPosition(2, 0), "Town"),
+                new Location(3, "D", new WorldPosition(1, 1), "Town"),
+                new Location(4, "E", new WorldPosition(5, 5), "Town"),
+            };
+            var connections = new[]
+            {
+                new Connection(0, 1, 2),
+                new Connection(1, 2, 2),
+                new Connection(0, 2, 10),
+                new Connection(1, 3, 3),
+                new Connection(4, 0, 1),
+            };
+            return new ReachabilityQuery(new WorldData(locations, connections));
+        }
+
+        [Test]
+        public void Reachability_ZeroBudget_ReturnsOnlyStart()
+        {
+            var result = CreateReachabilityWorld().FindReachable(0, 0);
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result[0], Is.EqualTo(0));
+        }
+
+        [Test]
+        public void Reachability_MultipleRoutes_UsesCheapestCost()
+        {
+            // Location 2 can be reached directly (10) or via 1 (2 + 2 = 4).
+            var result = CreateReachabilityWorld().FindReachable(0, 100);
+
+            Assert.That(result[2], Is.EqualTo(4));
+        }
+
+        [Test]
+        public void Reachability_IsBasedOnTotalCost_NotEdgeCount()
+        {
+            // Budget 3 reaches 1 (cost 2) but not 2, even though 2 is only one edge away.
+            var result = CreateReachabilityWorld().FindReachable(0, 3);
+
+            Assert.That(result.ContainsKey(1), Is.True);
+            Assert.That(result.ContainsKey(2), Is.False);
+        }
+
+        [Test]
+        public void Reachability_LocationCostingExactlyBudget_IsIncluded()
+        {
+            // 2 costs exactly 4 and must be included; 3 costs 5 and must not.
+            var result = CreateReachabilityWorld().FindReachable(0, 4);
+
+            Assert.That(result, Is.EquivalentTo(new Dictionary<int, int>
+            {
+                [0] = 0,
+                [1] = 2,
+                [2] = 4,
+            }));
+        }
+
+        [Test]
+        public void Reachability_DisconnectedLocation_IsNeverIncluded()
+        {
+            // 4 has an edge into 0, but no edge leads to 4, so even a huge budget cannot reach it.
+            var result = CreateReachabilityWorld().FindReachable(0, 1000);
+
+            Assert.That(result.ContainsKey(4), Is.False);
+            Assert.That(result.Count, Is.EqualTo(4));
         }
     }
 }

@@ -36,9 +36,6 @@ namespace FrontierDispatch.Core
         /// </summary>
         public RouteResult FindRoute(int startLocationId, int goalLocationId)
         {
-            // TODO: implement Dijkstra using your prepared world representation
-            // and MinPriorityQueue<T>.
-
             if (startLocationId == goalLocationId)
             { 
                 return new RouteResult(found: true, locationIds: new []{goalLocationId}, totalCost: 0, expandedCount: 0);
