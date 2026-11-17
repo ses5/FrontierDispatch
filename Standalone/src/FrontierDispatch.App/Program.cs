@@ -66,7 +66,7 @@ static void RunRouteWorkload()
 static void RunBaseline()
 {
     var worldBuildStopwatch = Stopwatch.StartNew();
-    WorldData world = WorldDatasetFactory.CreateLarge();
+    WorldData world = WorldDatasetFactory.CreateMedium();
     worldBuildStopwatch.Stop();
     
     var preparationStopwatch = Stopwatch.StartNew();
