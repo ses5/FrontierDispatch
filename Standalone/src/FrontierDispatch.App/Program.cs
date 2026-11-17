@@ -38,13 +38,15 @@ static void RunRouteWorkload()
     
     var sw  = Stopwatch.StartNew();
     long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+    
+    var sharedQueries = new WorldQueries(world);
 
     for (int i = 0; i < routeRequests; ++i)
     {
         int start = (i * 997) % locationCount;
         int goal = (i * 7919 + 1234) % locationCount;
 
-        var finder = new DijkstraRouteFinder(world);
+        var finder = new DijkstraRouteFinder(sharedQueries);
         RouteResult result = finder.FindRoute(start, goal);
 
         checksum += result.TotalCost;
@@ -53,7 +55,7 @@ static void RunRouteWorkload()
     sw.Stop();
     long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
 
-    Console.WriteLine("Route-finder workload (new finder per request)");
+    Console.WriteLine("Route-finder workload (new finder per request, shared WorldQueries)");
     Console.WriteLine($"Locations: {locationCount}");
     Console.WriteLine($"Connections: {world.Connections.Count}");
     Console.WriteLine($"Route requests: {routeRequests}");

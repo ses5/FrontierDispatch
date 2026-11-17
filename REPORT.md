@@ -76,10 +76,10 @@ Record reproducible before/after measurements for loading/preparation, repeated 
 
 | Measurement | Before (new WorldQueries per finder) | After (shared WorldQueries) |
 | --- | --- | --- |
-| Elapsed | 126.1680 ms | |
-| Per request | 0.6308 ms | |
-| Allocated | 115352.0 KB | |
-| Checksum | 31044 | |
+| Elapsed | 126.1680 ms | 89.5749 ms |
+| Per request | 0.6308 ms | 0.4479 ms |
+| Allocated | 115352.0 KB | 42042.2 KB |
+| Checksum | 31044 | 31044 |
 
 ## 7. Development reflection
 

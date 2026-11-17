@@ -15,7 +15,6 @@ namespace FrontierDispatch.Core
     /// </summary>
     public sealed class DijkstraRouteFinder
     {
-        private readonly WorldData _world;
         private readonly WorldQueries _worldQueries;
         
         /// <summary>
@@ -23,8 +22,12 @@ namespace FrontierDispatch.Core
         /// </summary>
         public DijkstraRouteFinder(WorldData world)
         {
-            _world = world ?? throw new ArgumentNullException(nameof(world));
             _worldQueries = new WorldQueries(world);
+        }
+
+        public DijkstraRouteFinder(WorldQueries worldQueries)
+        {
+            _worldQueries = worldQueries ?? throw new ArgumentNullException(nameof(worldQueries));
         }
 
         /// <summary>

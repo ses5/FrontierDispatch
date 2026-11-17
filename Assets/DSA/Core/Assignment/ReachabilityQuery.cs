@@ -19,7 +19,6 @@ namespace FrontierDispatch.Core
     /// </summary>
     public sealed class ReachabilityQuery
     {
-        private readonly WorldData _world;
         private readonly WorldQueries _worldQueries;
 
         /// <summary>
@@ -27,8 +26,12 @@ namespace FrontierDispatch.Core
         /// </summary>
         public ReachabilityQuery(WorldData world)
         {
-            _world = world ?? throw new ArgumentNullException(nameof(world));
             _worldQueries = new WorldQueries(world);
+        }
+
+        public ReachabilityQuery(WorldQueries worldQueries)
+        {
+            _worldQueries = worldQueries ?? throw new ArgumentNullException(nameof(worldQueries));
         }
 
         /// <summary>

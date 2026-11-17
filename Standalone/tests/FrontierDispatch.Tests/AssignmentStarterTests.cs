@@ -171,5 +171,47 @@ namespace FrontierDispatch.Tests
             Assert.That(result.ContainsKey(4), Is.False);
             Assert.That(result.Count, Is.EqualTo(4));
         }
+
+        [Test]
+        public void Dijkstra_SharedWorldQueries_GivesSameRoutesAsOwnWorldQueries()
+        {
+            // Several finders share one prepared WorldQueries. Each must return
+            // exactly the same route as a finder that builds its own.
+            WorldData world = WorldDatasetFactory.CreateMedium();
+            var sharedQueries = new WorldQueries(world);
+            int count = world.Locations.Count;
+
+            for (int i = 0; i < 20; ++i)
+            {
+                int start = (i * 997) % count;
+                int goal = (i * 7919 + 1234) % count;
+
+                RouteResult expected = new DijkstraRouteFinder(world).FindRoute(start, goal);
+                RouteResult actual = new DijkstraRouteFinder(sharedQueries).FindRoute(start, goal);
+
+                Assert.That(actual.Found, Is.EqualTo(expected.Found));
+                Assert.That(actual.TotalCost, Is.EqualTo(expected.TotalCost));
+                Assert.That(actual.LocationIds, Is.EqualTo(expected.LocationIds));
+            }
+        }
+
+        [Test]
+        public void Reachability_SharedWorldQueries_GivesSameResultAsOwnWorldQueries()
+        {
+            WorldData world = WorldDatasetFactory.CreateMedium();
+            var sharedQueries = new WorldQueries(world);
+
+            var expected = new ReachabilityQuery(world).FindReachable(0, 30);
+            var actual = new ReachabilityQuery(sharedQueries).FindReachable(0, 30);
+
+            Assert.That(actual, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void SharedWorldQueriesConstructors_RejectNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => new DijkstraRouteFinder((WorldQueries)null!));
+            Assert.Throws<ArgumentNullException>(() => new ReachabilityQuery((WorldQueries)null!));
+        }
     }
 }
