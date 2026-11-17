@@ -56,11 +56,11 @@ Record reproducible before/after measurements for loading/preparation, repeated 
 
 | Measurement | Before (starter) | After (phase 2) |
 | --- | --- | --- |
-| World build | | 1.3309 ms |
-| Preparation | | 0.7023 ms |
-| Questions (5000 iterations) | | 0.2100 ms |
-| Allocated during questions | | 0 bytes |
-| Checksum | | 6267100 |
+| World build | 1.3993 ms | 1.3309 ms |
+| Preparation | 0.0628 ms | 0.7023 ms |
+| Questions (5000 iterations) | 434.4452 ms | 0.2100 ms |
+| Allocated during questions | 440000 bytes | 0 bytes |
+| Checksum | 6267100 | 6267100 |
 
 ## 7. Development reflection
 
