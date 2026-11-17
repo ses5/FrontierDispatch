@@ -78,8 +78,9 @@ static void RunBaseline()
     int checksum = 0;
 
     const int iterations = 5000;
-
+    
     var questionsStopwatch = Stopwatch.StartNew();
+    long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
 
     for (int i = 0; i < iterations; ++i)
     {
@@ -93,14 +94,16 @@ static void RunBaseline()
     }
 
     questionsStopwatch.Stop();
+    long allocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
 
     Console.WriteLine("Baseline world-query workload");
     Console.WriteLine($"Locations: {world.Locations.Count}");
     Console.WriteLine($"Connections: {world.Connections.Count}");
     Console.WriteLine($"Iterations: {iterations}");
-    Console.WriteLine($"World build Elapsed: {worldBuildStopwatch.Elapsed.TotalMilliseconds} ms");
-    Console.WriteLine($"Preparation Elapsed: {preparationStopwatch.Elapsed.TotalMilliseconds} ms");
-    Console.WriteLine($"Questions Elapsed: {questionsStopwatch.Elapsed.TotalMilliseconds} ms");
+    Console.WriteLine($"World build Elapsed: {worldBuildStopwatch.Elapsed.TotalMilliseconds:F4} ms");
+    Console.WriteLine($"Preparation Elapsed: {preparationStopwatch.Elapsed.TotalMilliseconds:F4} ms");
+    Console.WriteLine($"Questions Elapsed: {questionsStopwatch.Elapsed.TotalMilliseconds:F4} ms");
+    Console.WriteLine($"Allocated: {allocatedBytes} Bytes");
     Console.WriteLine($"Checksum: {checksum}");
     Console.WriteLine("Absolute time varies by machine. Keep this result for before/after comparison.");
 }
