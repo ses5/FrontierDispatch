@@ -26,8 +26,8 @@ namespace FrontierDispatch.Core
         {
             _world = world ?? throw new ArgumentNullException(nameof(world));
 
-            _locationsByID = new Dictionary<int, Location>();
-            _connectionsByFromID = new Dictionary<int, List<Connection>>();
+            _locationsByID = new Dictionary<int, Location>(_world.Locations.Count);
+            _connectionsByFromID = new Dictionary<int, List<Connection>>(_world.Locations.Count);
 
             foreach (Location location in _world.Locations)
             {
