@@ -62,9 +62,28 @@ Record reproducible before/after measurements for loading/preparation, repeated 
 | Allocated during questions | 440000 bytes | 0 bytes |
 | Checksum | 6267100 | 6267100 |
 
+### Average baseline world-query workload, large world (`--baseline` with `CreateLarge()`, 5 runs)
+
+| Measurement | Before (starter) | After (phase 2) |
+| --- | --- | --- |
+| World build | 8.2625 ms | 7.9687 ms |
+| Preparation | 0.0928 ms | 19.4650 ms |
+| Questions (5000 iterations) | 7145.3766 ms | 0.7216 ms |
+| Allocated during questions | 447976 bytes | 0 bytes |
+| Checksum | 99787400 | 99787400 |
+
+### Average route-finder workload (`--routes`, medium world, 200 requests, 5 runs)
+
+| Measurement | Before (new WorldQueries per finder) | After (shared WorldQueries) |
+| --- | --- | --- |
+| Elapsed | 126.1680 ms | |
+| Per request | 0.6308 ms | |
+| Allocated | 115352.0 KB | |
+| Checksum | 31044 | |
+
 ## 7. Development reflection
 
-While adding allocation measurement to the --baseline workload, the query loop reported 40 bytes allocated, even though my FindLocationById and FindOutgoingConnections only return existing objects and should not allocate anything. I suspected the measurement itself rather than my code. The allocation counter was read before Stopwatch.StartNew(), and since Stopwatch is a class, creating it allocates an object on the heap. That allocation was therefore counted as part of the loop. To test this, I moved the counter reading so it happens after the stopwatch is created. The result dropped to 0 bytes, which confirmed the cause. I applied the same ordering to the --routes workload so they work the same way.
+While adding allocation measurement to the `--baseline` workload, the query loop reported 40 bytes allocated, even though my `FindLocationById` and `FindOutgoingConnections` only return existing objects and should not allocate anything. I suspected the measurement itself rather than my code. The allocation counter was read before `Stopwatch.StartNew()`, and since Stopwatch is a class, creating it allocates an object on the heap. That allocation was therefore counted as part of the loop. To test this, I moved the counter reading so it happens after the stopwatch is created. The result dropped to 0 bytes, which confirmed the cause. I applied the same ordering to the `--routes` workload so they work the same way.
 
 ## 8. Tools and AI assistance
 

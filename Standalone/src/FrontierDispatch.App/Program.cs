@@ -36,8 +36,8 @@ static void RunRouteWorkload()
 
     long checksum = 0;
     
-    long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
     var sw  = Stopwatch.StartNew();
+    long allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
 
     for (int i = 0; i < routeRequests; ++i)
     {
@@ -66,7 +66,7 @@ static void RunRouteWorkload()
 static void RunBaseline()
 {
     var worldBuildStopwatch = Stopwatch.StartNew();
-    WorldData world = WorldDatasetFactory.CreateMedium();
+    WorldData world = WorldDatasetFactory.CreateLarge();
     worldBuildStopwatch.Stop();
     
     var preparationStopwatch = Stopwatch.StartNew();
