@@ -32,7 +32,13 @@ FindLocationById now uses a dictionary (hash table) with the location ID as the 
 
 ## 3. Algorithms and adaptation
 
-Explain your route finder at a useful high level and how the travel-budget query adapts the same ideas.
+My route finder is Dijkstra's algorithm. It finds the cheapest possible path from a start location to a specified goal. If the start and the goal are the same place, it immediately returns a route containing only that place with a cost of 0. Otherwise, beginning at the start, it repeatedly picks the cheapest place it can reach out of a priority queue. The priority queue keeps the cheapest available place at the front, sifting up when a place is added and sifting down when a place is removed.
+
+The algorithm then checks the neighbors of the picked place. If a neighbor has never been reached before, or if it's cheaper to reach it through this place than the cheapest cost found to it so far, the neighbor is added to the priority queue. At the same time, `bestCost` and `cameFrom` are updated. `bestCost` is a dictionary that stores the cheapest cost found so far from the start to each reached place. `cameFrom` is a dictionary that stores the previous place on the cheapest route to each place. On every iteration the algorithm skips outdated queue entries, where a cheaper route to that place has already been found, so that no unnecessary checks are made.
+
+Before searching through the current place's neighbors, the algorithm checks if the current place is the goal. If it is, it builds a list by following `cameFrom` from the goal back to the start. Since this gives the places in reverse order, the list is flipped before it's returned, giving the cheapest path to the goal. It is safe to stop as soon as the goal is picked out, because no other place in the queue can lead to a cheaper path there. If the goal can't be reached, the queue eventually runs empty. The algorithm then returns a `RouteResult` with `Found` set to false and an empty route, instead of throwing an error.
+
+`ReachabilityQuery` uses the same framework. What separates it from Dijkstra's algorithm is that it doesn't have a goal to find. Instead, it finds all places whose `bestCost` is within a set `maxTravelCost`. The budget check is located right before a neighbor is saved in `bestCost` and added to the queue. The query stops by itself, not because it reaches a goal (as there is none), but because nothing over the budget is ever added to the queue, so the queue eventually becomes empty. It then returns `bestCost` directly, since it can only contain places within the budget. The goal check, `cameFrom` and the path reconstruction have been removed, as no route needs to be built.
 
 ## 4. Complexity
 
@@ -80,6 +86,8 @@ Record reproducible before/after measurements for loading/preparation, repeated 
 | Per request | 0.6308 ms | 0.4479 ms |
 | Allocated | 115352.0 KB | 42042.2 KB |
 | Checksum | 31044 | 31044 |
+
+
 
 ## 7. Development reflection
 
