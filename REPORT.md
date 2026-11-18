@@ -44,15 +44,25 @@ Before searching through the current place's neighbors, the algorithm checks if 
 
 | Operation | Your representation/algorithm | Complexity | Short explanation |
 | --- | --- | --- | --- |
-| Find location by ID | | | |
-| Get outgoing connections | | | |
-| Priority queue enqueue | | | |
-| Priority queue dequeue-min | | | |
-| Route finding | | | |
+| Find location by ID | Dictionary (hash table) | O(1) average | Stores every `Location` with an int key in a dictionary. This increases work during start, but greatly improves finding a location by ID. This is because a dictionary looks up a location directly by its ID, instead of scanning through every location. This gives it an average complexity of O(1).|
+| Get outgoing connections | Adjacency list (dictionary of lists) | O(1 + d) | Stores a list of a place's outgoing `Connection`s and that list in a dictionary with the place's ID as the key. This increases work during start, but greatly improves finding a place's outgoing connections. This looks up the place’s list directly (the 1), and then only goes through that place’s d connections (the d).|
+| Priority queue enqueue | Binary min-heap stored in a List | O(log n) | Inserts an element at the end of a list before `SiftUp` moves it upward. It will be moved upward until its parent is less than or equal to itself. Worst case scenario is moving it up the tree's full height, resulting in complexity of O(log n).|
+| Priority queue dequeue-min | Binary min-heap stored in a List | O(log n) | The cheapest element is removed from the front, and the last element is moved to the top. Then `SiftDown` moves an element down. It will be moved down until both its children are greater than or equal to itself. Worst case scenario is moving it down the tree's full height, resulting in complexity of O(log n).|
+| Route finding | Dijkstra's algorithm with the binary heap | O((V + E) log V) | Each place is removed from the queue at most once, giving about V dequeues. For each place, the algorithm goes through its outgoing connections. As a result, E connections are checked and each one of them can lead to an enqueue. Every queue operation costs log V because of the binary heap. This gives a total complexity of O((V + E) log V).|
 
 ## 5. Correctness and testing
 
-Important tests/edge cases and what they demonstrate.
+These are the 4 tests I feel are most important. 
+
+`PriorityQueue_DequeueAll_ReturnsItemsInAscendingPriorityOrder` enqueues twelve items in mixed order, including duplicate priorities, and then dequeues all of them. They come out in ascending order and the queue ends up empty, showing that the heap invariant holds after many inserts and removals.
+
+`Dijkstra_PrefersCheaperRouteWithMoreSteps` uses a world where the direct connection from 0 to 2 costs 10, while the route through 1 costs 2 + 3 = 5. The finder returns cost 5 and the route [0, 1, 2], showing that it picks the cheapest route rather than the one with the fewest edges, and that the path is reconstructed correctly.
+
+`Reachability_LocationCostingExactlyBudget_IsIncluded` uses a small world where the cheapest costs from location 0 are known in advance. With a budget of 4, a location costing exactly 4 is included while one costing 5 is not, showing that the budget check uses "at most" correctly.
+
+`Dijkstra_SharedWorldQueries_GivesSameRoutesAsOwnWorldQueries` runs 20 deterministic start/goal pairs on the medium world. It compares a route finder that builds its own `WorldQueries` with one that uses a shared instance, and checks that both return the same result, cost and route. This shows that the phase 6 optimization did not change behavior.
+
+Other tests cover start equals goal, an unreachable goal, a zero budget, disconnected locations and null arguments to the new constructors. The `--baseline` and `--routes` workloads also print a checksum, which stayed the same before and after each optimization.
 
 ## 6. Performance investigation
 
