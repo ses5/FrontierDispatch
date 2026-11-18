@@ -1,7 +1,5 @@
 # REPORT.md - Individual Assignment
 
-Keep this concise and specific to your implementation.
-
 ## 1. Initial analysis
 
 - How are locations and connections represented in the baseline?
@@ -66,8 +64,6 @@ Other tests cover start equals goal, an unreachable goal, a zero budget, disconn
 
 ## 6. Performance investigation
 
-Record reproducible before/after measurements for loading/preparation, repeated runtime work, and relevant allocation behavior. Explain what changed and why.
-
 ### Average baseline world-query workload (`--baseline`, medium world, 5 runs)
 
 | Measurement | Before (starter) | After (phase 2) |
@@ -97,7 +93,11 @@ Record reproducible before/after measurements for loading/preparation, repeated 
 | Allocated | 115352.0 KB | 42042.2 KB |
 | Checksum | 31044 | 31044 |
 
+When looking at the two `--baseline` tables, both show about 440000 bytes allocated (440000 for medium world, 447976 bytes for large world specifically) before any changes were made. This allocated memory is the result of `FindOutgoingConnections` making new lists on every call. By changing `FindOutgoingConnections` so that it uses a prepared list built once in the constructor instead of making new ones on every iteration, the allocated memory was brought down to 0 bytes. This change, together with the dictionary for `FindLocationById`, also had the largest measured effect of all my changes. The questions went from 434 ms to 0.21 ms on the medium world, because each lookup now goes straight to the right location or list instead of scanning through every location and connection. It came at a cost though, since preparation went from 0.06 ms to 0.70 ms (0.09 ms to 19.5 ms on the large world) and the dictionaries take up extra memory. This means I traded more memory and a slower start for much faster queries. For a very small world this might not be worth it, as building the dictionaries can cost more than simply scanning a handful of locations. The benefit shows when the world grows. On the large world the old version became about 16 times slower, while my version only became about 3 times slower.
 
+Memory allocation was also minimized in the `--routes` workload through similar, but not identical changes. Before any changes, it rebuilt `WorldQueries` for every finder, meaning it was rebuilt 200 times. By making it so both `DijkstraRouteFinder` and `ReachabilityQuery` use a shared `WorldQueries`, this number was brought down to 1. The allocated memory didn't go down to 0 this time. The remaining allocations came almost entirely from the working collections created in each `FindRoute` call (210 KB per search). This includes extra arrays created when the collections grow.
+
+The main reason I didn't change this is that it could cause finders and their searches to collide. The change would've meant keeping the collections inside the finder and clearing them between searches, instead of creating new ones each time. If two parts of the game used the same finder at once, they would write to the same collections and ruin each other's results. The memory is also only used during the search and is thrown away right after, which .NET's garbage collector handles cheaply. For these reasons I decided that reducing the allocations further wouldn't be a useful trade-off. If the world became much larger, these remaining allocations are what I would investigate next, for example by giving the collections a starting size. Since the location IDs in the supplied worlds go from 0 upwards without gaps, I would also look into replacing the dictionaries with plain arrays.
 
 ## 7. Development reflection
 
@@ -105,8 +105,12 @@ While adding allocation measurement to the `--baseline` workload, the query loop
 
 ## 8. Tools and AI assistance
 
-Briefly describe relevant assistance, if any.
+I've used Claude Code to help me with certain parts of this assignment. Mainly it was used to help me understand things, such as what to do and what certain things meant. I'm quite bad at reading other peoples code, so having Claude help me understand not only made me work more efficiently but has also improved my code-reading skills. 
+
+I also had Claude help me with writing tests. I've never worked with a baseline or the console like this before so adding tests was something I understood little about. When I had Claude make me something like this I always made sure to have it explain to me how it worked so I could read, understand and learn something from it.
+
+The only times I ever asked Claude to directly change my files for me was during the writing of this report and when I wanted to remove all leftover comments in finished scripts. A great example of what I asked Claude to do was make the tables for me in section 6. I had no clue how to make tables in a .md file, and asking Claude to fill in the tables with all the data simply saved me from a repetitive, tedious task. I also had Claude look through my text to make sure I didn't make any mistakes such as spelling.
 
 ## 9. VG extension
 
-Only if attempting VG: heuristic, traversal constraints, correctness, and Dijkstra/A* comparison.
+VG was not attempted.
