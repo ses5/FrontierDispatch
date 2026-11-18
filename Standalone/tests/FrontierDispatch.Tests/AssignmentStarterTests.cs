@@ -83,6 +83,30 @@ namespace FrontierDispatch.Tests
         }
 
         [Test]
+        public void Dijkstra_UnreachableGoal_ReturnsNotFound()
+        {
+            // 0 -> 1 exists, but nothing leads to 2. Connections are directed,
+            // so the edge 2 -> 0 does not make 2 reachable from 0.
+            var locations = new[]
+            {
+                new Location(0, "A", new WorldPosition(0, 0), "Town"),
+                new Location(1, "B", new WorldPosition(1, 0), "Town"),
+                new Location(2, "C", new WorldPosition(2, 0), "Town"),
+            };
+            var connections = new[]
+            {
+                new Connection(0, 1, 1),
+                new Connection(2, 0, 1),
+            };
+            var finder = new DijkstraRouteFinder(new WorldData(locations, connections));
+
+            RouteResult result = finder.FindRoute(0, 2);
+
+            Assert.That(result.Found, Is.False);
+            Assert.That(result.LocationIds, Is.Empty);
+        }
+
+        [Test]
         public void Reachability_ZeroBudget_IncludesStartAtZeroCost()
         {
             var query = new ReachabilityQuery(WorldDatasetFactory.CreateSmall());
