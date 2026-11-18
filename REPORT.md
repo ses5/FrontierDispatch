@@ -109,7 +109,7 @@ I've used Claude Code to help me with certain parts of this assignment. Mainly i
 
 I also had Claude help me with writing tests. I've never worked with a baseline or the console like this before so adding tests was something I understood little about. When I had Claude make me something like this I always made sure to have it explain to me how it worked so I could read, understand and learn something from it.
 
-The only times I ever asked Claude to directly change my files for me was during the writing of this report and when I wanted to remove all leftover comments in finished scripts. A great example of what I asked Claude to do was make the tables for me in section 6. I had no clue how to make tables in a .md file, and asking Claude to fill in the tables with all the data simply saved me from a repetitive, tedious task. I also had Claude look through my text to make sure I didn't make any mistakes such as spelling.
+The only other times I ever asked Claude to directly change my files for me was during the writing of this report and when I wanted to remove all leftover comments in finished scripts. A great example of what I asked Claude to do was make the tables for me in section 6. I had no clue how to make tables in a .md file, and asking Claude to fill in the tables with all the data simply saved me from a repetitive, tedious task. I also had Claude look through my text to make sure I didn't make any mistakes such as spelling. Claude also wrote drafts for sections 5 and 7 that I then changed and adapted to fit with my work.
 
 ## 9. VG extension
 
