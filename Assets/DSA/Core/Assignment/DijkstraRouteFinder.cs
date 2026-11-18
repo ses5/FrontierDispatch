@@ -9,9 +9,8 @@ namespace FrontierDispatch.Core
     /// Finds minimum-total-cost routes through a Frontier Dispatch world
     /// using Dijkstra's shortest-path algorithm.
     ///
-    /// This class is intentionally incomplete in the assignment starter.
-    /// It should eventually use the student's prepared world representation
-    /// and MinPriorityQueue implementation.
+    /// It uses the prepared WorldQueries lookups and the MinPriorityQueue
+    /// binary heap.
     /// </summary>
     public sealed class DijkstraRouteFinder
     {

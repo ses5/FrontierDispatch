@@ -13,8 +13,6 @@ namespace FrontierDispatch.Core
     /// for one goal, the query determines the cheapest known cost to every
     /// location that fits within the supplied budget.
     ///
-    /// This class is intentionally incomplete in the assignment starter.
-    ///
     /// What do we mean by "query"? In this context, a query is simply a one-time search for information.
     /// </summary>
     public sealed class ReachabilityQuery
@@ -43,8 +41,6 @@ namespace FrontierDispatch.Core
         /// </summary>
         public IReadOnlyDictionary<int, int> FindReachable(int startLocationId, int maxTravelCost)
         {
-            // TODO: adapt shortest-path reasoning to the travel-cost budget.
-            
             var bestCost = new Dictionary<int, int>();
             var frontier = new MinPriorityQueue<(int Id, int Cost)>();
 
